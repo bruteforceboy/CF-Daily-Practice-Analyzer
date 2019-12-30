@@ -23,7 +23,7 @@ rating_dict = {}
 
 def validate(date_text):
     try:
-        datetime.datetime.strptime(date_text, '%d.%m.%Y %H:%M:%S')
+    	datetime.datetime.strptime(date_text, '%d.%m.%Y %H:%M:%S')
     except ValueError:
         raise ValueError("Incorrect data format, should be DD.MM.YYYY HH:MM:SS")
 
@@ -52,19 +52,20 @@ def analyze(handle, start_time, end_time):
 	return problem_ratings
 
 def get_rating(handle):
-	url = "https://codeforces.com/api/user.rating?handle="+handle
-	response = urllib.request.urlopen(url)
-	data = json.loads(response.read()) # errors might come from here if handles are spelt incorrectly be careful!
+	check =False
+	try:
+		url="https://codeforces.com/api/user.rating?handle="+handle
+		response=urllib.request.urlopen(url)
+		data=json.loads(response.read())
 
-	if(data["status"] != "OK"):
-		raise SystemExit('Error: Probably bad connection or making too much requests, contact me.')	
-
-	data = data["result"]
-
-	if len(data) == 0:
-		return 0 # unrated users like lordvidex
-
-	return int(data[len(data)-1]["newRating"])
+		if (data["status"]!="OK"):
+			raise SystemExit('Error:probeasajfkljfsad')
+		data=data["result"]
+		if (len(data)==0):
+			return 0
+		return int(data[len(data)-1]["newRating"])
+	except:
+		return get_rating(handle)
 
 Pair = namedtuple("Pair", ["first", "second"])
 
@@ -151,8 +152,8 @@ def main():
 		user_data = analyze(user, beg_seconds, end_seconds)
 		if len(user_data) < 3:
 			print("[contestant] " + user + " solved " + str(len(user_data)) + " problem(s) not upto 3\n");
-		elif lower_than_rating(user_data, user) == 1:
-			print("[contestant] " + user + " solved easier problem(s) than his current rating\n")
+		#elif lower_than_rating(user_data, user) == 1:
+		#	print("[contestant] " + user + " solved easier problem(s) than his current rating\n")
 		else:
 			data.append(Pair(user_data, user))
 
