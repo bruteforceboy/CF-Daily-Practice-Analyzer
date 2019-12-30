@@ -28,28 +28,32 @@ def validate(date_text):
         raise ValueError("Incorrect data format, should be DD.MM.YYYY HH:MM:SS")
 
 def analyze(handle, start_time, end_time):
-	url = "https://codeforces.com/api/user.status?handle="+handle+"&from=1&count=30" # url is limited to 30 problems per day, increase if necessary.
-	response = urllib.request.urlopen(url)
-	data = json.loads(response.read()) # errors might come from here if handles are spelt incorrectly be careful!
+	try:
+		url = "https://codeforces.com/api/user.status?handle=" + handle + "&from=1&count=30"  # url is limited to 30 problems per day, increase if necessary.
+		response = urllib.request.urlopen(url)
+		data = json.loads(response.read())  # errors might come from here if handles are spelt incorrectly be careful!
 
-	if(data["status"] != "OK"):
-		raise SystemExit('Error: Probably bad connection or making too much requests, contact me.')	
+		if (data["status"] != "OK"):
+			raise SystemExit('Error: Probably bad connection or making too much requests, contact me.')
 
-	data = data["result"]
-	problem_ratings = []
-	seen_problems = set()
-	for submission in data:
-		if int(submission["creationTimeSeconds"]) >= int(start_time) and int(submission["creationTimeSeconds"]) <= end_time and submission["verdict"] == "OK":
-			if "rating" not in submission["problem"]:
-				continue
-			problem_id = str(submission["problem"]["contestId"]) + str(submission["problem"]["index"])
-			if problem_id not in seen_problems:
-				seen_problems.add(problem_id)
-				problem_ratings.append(int(submission["problem"]["rating"]))
+		data = data["result"]
+		problem_ratings = []
+		seen_problems = set()
+		for submission in data:
+			if int(submission["creationTimeSeconds"]) >= int(start_time) and int(
+					submission["creationTimeSeconds"]) <= end_time and submission["verdict"] == "OK":
+				if "rating" not in submission["problem"]:
+					continue
+				problem_id = str(submission["problem"]["contestId"]) + str(submission["problem"]["index"])
+				if problem_id not in seen_problems:
+					seen_problems.add(problem_id)
+					problem_ratings.append(int(submission["problem"]["rating"]))
 
-	problem_ratings.sort(reverse = True)
+		problem_ratings.sort(reverse=True)
 
-	return problem_ratings
+		return problem_ratings
+	except:
+		return analyze(handle, start_time, end_time);
 
 def get_rating(handle):
 	check =False
