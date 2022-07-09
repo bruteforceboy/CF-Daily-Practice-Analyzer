@@ -1,8 +1,5 @@
 # -----------------------------------------------------------
 # Jmokut's CF Daily Practice
-# 
-# (C) 2019 Ogbonna Chibuoyim
-# Email: ogbonnachibuoyim12@gmail.com
 # -----------------------------------------------------------
 
 # TO AVOID ERRORS 
