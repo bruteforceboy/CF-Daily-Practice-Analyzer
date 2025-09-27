@@ -62,6 +62,20 @@ def get_rating(handle):
 		return 0 # unrated users like lordvidex
 
 	return int(data[len(data)-1]["newRating"])
+def get_user(handle):
+	url = "https://codeforces.com/api/user.info?handles="+handle
+	response = urllib.request.urlopen(url)
+	data = json.loads(response.read()) # errors might come from here if handles are spelt incorrectly be careful!
+
+	if(data["status"] != "OK"):
+		raise SystemExit('Error: Probably bad connection or making too much requests, contact me.')	
+
+	data = data["result"]
+
+	if len(data) == 0:
+		return 0 # unrated users like lordvidex
+
+	return data[0]["handle"]
 
 Pair = namedtuple("Pair", ["first", "second"])
 
@@ -134,9 +148,18 @@ def main():
 	end_seconds = (end_obj - datetime.datetime(1970,1,1)).total_seconds() - 3600 # since nigeria is utc +1
 
 	users_list = ["fortmax120", "jmokut", "madlogic", "just_josh", "inheritag", "lordvidex"] # you can extend the list as much as you want
+	invalid_users = []
 
 	print("\nGetting user ratings...\n")
-	for user in users_list:
+	for i in range(len(users_list)):
+		user = users_list[i]
+		user_exists = get_user(user)
+		if user_exists == 0:
+			print("[contestant] " + user + " does not exist, skipping...\n")
+			invalid_users.append(user)
+			continue
+		user = user_exists
+		users_list[i] = user
 		rating_dict[user] = get_rating(user)
 		if rating_dict[user] == 0:
 			print("[contestant] " + user + " is unrated (using 1200 as default rating), beware\n")
@@ -145,6 +168,8 @@ def main():
 	print("Analyzing problems solved by users...\n")
 	data = []
 	for user in users_list:
+		if user in invalid_users:
+			continue
 		user_data = analyze(user, beg_seconds, end_seconds)
 		if len(user_data) < 3:
 			print("[contestant] " + user + " solved " + str(len(user_data)) + " problem(s) not upto 3\n");
